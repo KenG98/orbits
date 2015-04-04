@@ -12,25 +12,29 @@ document.body.appendChild(renderer.domElement);
 
 //gravity center
 var gravityPosition = {x:0, y:0, z:0};
-var gravityPull = 0.1;
+var gravityStrength = 0.1;
 var gravityGeometry = new THREE.SphereGeometry(30);
 var gravityMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
 var gravityBody = new THREE.Mesh(gravityGeometry, gravityMaterial);
 gravityBody.castShadow = true;
 gravityBody.receiveShadow = true;
-gravityBody.position = gravityPosition;
+gravityBody.position.x = gravityPosition.x;
+gravityBody.position.y = gravityPosition.y;
+gravityBody.position.z = gravityPosition.z;
 scene.add(gravityBody);
 
 
 //orb
-var orbPosition = {x:100, y:100, z: 100};
-var orbForce = {x:1, y:1, z: 1};
+var orbPosition = {x:100, y:0, z: 0};
+var orbForce = {x:0, y:0, z:2};
 var orbGeometry = new THREE.SphereGeometry(10);
 var orbMaterial = new THREE.MeshLambertMaterial({color: 0x00ff00});
 var orbBody = new THREE.Mesh(orbGeometry, orbMaterial);
 orbBody.castShadow = true;
 orbBody.receiveShadow = true;
-orbBody.position = orbPosition;
+orbBody.position.x = orbPosition.x;
+orbBody.position.y = orbPosition.y;
+orbBody.position.z = orbPosition.z;
 scene.add(orbBody);
 
 
@@ -42,17 +46,40 @@ spotLight.shadowCameraNear = 500;
 spotLight.shadowCameraFar = 2000;
 spotLight.shadowCameraFov = 50;
 scene.add( spotLight );
-//amvient light
+//ambient light
 var ambientLight = new THREE.AmbientLight( 0x555555 );
 scene.add( ambientLight );
 
-camera.position.x = 300;
-camera.position.y = 300;
+camera.position.x = 0;
+camera.position.y = 0;
 camera.position.z = 300;
 camera.lookAt({x:0,y:0,z:0});
 
+function moveOrb(){
+	var deltaX = orbPosition.x - gravityPosition.x;
+	var deltaY = orbPosition.y - gravityPosition.y;
+	var deltaZ = orbPosition.z - gravityPosition.z;
+	var distanceToGrav = Math.sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
+	deltaX /= distanceToGrav; 
+	deltaX *= gravityStrength;
+	deltaY /= distanceToGrav; 
+	deltaY *= gravityStrength;
+	deltaZ /= distanceToGrav; 
+	deltaZ *= gravityStrength;
+	orbForce.x -= deltaX;
+	orbForce.y -= deltaY;
+	orbForce.z -= deltaZ;
+	orbPosition.x += orbForce.x;
+	orbPosition.y += orbForce.y;
+	orbPosition.z += orbForce.z;
+	orbBody.position.x = orbPosition.x;
+	orbBody.position.y = orbPosition.y;
+	orbBody.position.z = orbPosition.z;
+}
+
 function render(){
 	//move the orb
+	moveOrb();
 	requestAnimationFrame(render);
 	renderer.render(scene, camera);
 }

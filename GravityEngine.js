@@ -55,6 +55,11 @@ camera.position.y = 0;
 camera.position.z = 300;
 camera.lookAt({x:0,y:0,z:0});
 
+//move up, look down, push orb
+camera.position.y += 100;
+camera.lookAt({x:0,y:0,z:0});
+
+
 function moveOrb(){
 	var deltaX = orbPosition.x - gravityPosition.x;
 	var deltaY = orbPosition.y - gravityPosition.y;
